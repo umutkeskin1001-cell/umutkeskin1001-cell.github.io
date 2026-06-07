@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Cassiopeia Prime — BilFest sunum slaytları. DNA-dizisinden plasmid risk tahmini.">
+<meta name="theme-color" content="#0d1117">
+<title>Cassiopeia Prime — Sunum</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d1117'/%3E%3Ccircle cx='32' cy='32' r='18' fill='none' stroke='%2358a6ff' stroke-width='4'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%2358a6ff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ── Presentation layout ───────────────────────────────────────────── */
+.deck {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  overflow: hidden;
+  font-family: var(--font-ui);
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px 80px 100px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(40px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+}
+.slide.prev { transform: translateX(-40px); }
+
+.slide-num {
+  position: absolute;
+  bottom: 28px;
+  right: 32px;
+  font-family: var(--font);
+  font-size: 0.75rem;
+  color: var(--text3);
+  z-index: 5;
+}
+
+.slide-eyebrow {
+  font-family: var(--font);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 18px;
+  font-weight: 500;
+}
+
+.slide-title {
+  font-size: 3.4rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin-bottom: 28px;
+  color: var(--text);
+  max-width: 1100px;
+}
+.slide-title em { font-style: normal; color: var(--accent); }
+
+.slide-subtitle {
+  font-size: 1.4rem;
+  color: var(--text2);
+  line-height: 1.5;
+  max-width: 900px;
+  font-weight: 300;
+}
+
+.slide-body {
+  font-size: 1.15rem;
+  color: var(--text);
+  line-height: 1.65;
+  max-width: 1000px;
+  margin-top: 16px;
+}
+.slide-body strong { color: var(--accent); font-weight: 600; }
+
+.slide-grid {
+  display: grid;
+  gap: 28px;
+  margin-top: 32px;
+}
+.slide-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.slide-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.slide-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  position: relative;
+}
+.tile .num {
+  font-family: var(--font);
+  font-size: 0.72rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+.tile h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.tile p {
+  font-size: 0.95rem;
+  color: var(--text2);
+  line-height: 1.55;
+}
+
+/* title slide */
+.title-slide {
+  text-align: left;
+}
+.title-slide .logo-large {
+  width: 96px;
+  height: 96px;
+  border: 4px solid var(--accent);
+  border-radius: 50%;
+  position: relative;
+  margin-bottom: 32px;
+}
+.title-slide .logo-large::after {
+  content: "";
+  position: absolute;
+  inset: 30%;
+  background: var(--accent);
+  border-radius: 50%;
+}
+.title-slide h1 {
+  font-size: 5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 24px;
+}
+.title-slide h1 span { color: var(--accent); }
+.title-slide .tagline {
+  font-size: 1.6rem;
+  color: var(--text2);
+  line-height: 1.4;
+  font-weight: 300;
+  max-width: 800px;
+  margin-bottom: 48px;
+}
+.title-slide .meta {
+  font-family: var(--font);
+  font-size: 0.85rem;
+  color: var(--text3);
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.title-slide .meta .badge {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* big stat */
+.big-stat {
+  text-align: center;
+  margin: 24px 0;
+}
+.big-stat .num {
+  font-size: 8rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  font-family: var(--font);
+}
+.big-stat .unit {
+  font-size: 2rem;
+  color: var(--text2);
+  font-weight: 300;
+  margin-left: 12px;
+}
+.big-stat .desc {
+  font-size: 1.1rem;
+  color: var(--text2);
+  margin-top: 16px;
+}
+
+/* comparison table */
+.bench-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font-family: var(--font);
+  font-size: 0.92rem;
+}
+.bench-table th,
+.bench-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.bench-table th {
+  color: var(--text2);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+.bench-table td { color: var(--text); }
+.bench-table tr.us td { background: var(--accent-dim); }
+.bench-table tr.us td:first-child { color: var(--accent); font-weight: 600; }
+.bench-table .highlight { color: var(--green); font-weight: 600; }
+
+/* plasmid SVG container */
+.svg-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+  min-height: 380px;
+}
+
+/* progress bar */
+.deck-progress {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--accent);
+  z-index: 10;
+  transition: width 0.3s ease;
+}
+
+.deck-dots {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 6;
+}
+.deck-dots .dot {
+  width: 24px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.deck-dots .dot.active {
+  background: var(--accent);
+  width: 40px;
+}
+.deck-dots .dot:hover { background: var(--text2); }
+
+.deck-hint {
+  position: fixed;
+  bottom: 28px;
+  left: 32px;
+  font-family: var(--font);
+  font-size: 0.7rem;
+  color: var(--text3);
+  z-index: 5;
+}
+
+.deck-exit {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 8;
+  color: var(--text3);
+  text-decoration: none;
+  font-family: var(--font);
+  font-size: 0.75rem;
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: rgba(13, 17, 23, 0.85);
+  backdrop-filter: blur(6px);
+}
+.deck-exit:hover { color: var(--accent); border-color: var(--accent); }
+
+/* architecture slide - clean visual only */
+.arch-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.callout {
+  display: inline-block;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 18px 28px;
+  font-family: var(--font);
+  font-size: 1.05rem;
+  color: var(--text);
+  margin-top: 24px;
+}
+.callout .accent { color: var(--accent); font-weight: 600; }
+
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+  font-family: var(--font);
+  font-size: 0.9rem;
+}
+.flow .step {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 20px;
+  color: var(--text);
+}
+.flow .arrow { color: var(--accent); font-size: 1.4rem; }
+
+.kpi-row {
+  display: flex;
+  gap: 32px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  min-width: 160px;
+}
+.kpi .v {
+  font-family: var(--font);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.kpi .l {
+  font-size: 0.78rem;
+  color: var(--text2);
+  margin-top: 4px;
+}
+
+.warning-strip {
+  display: flex;
+  gap: 16px;
+  background: rgba(248, 81, 73, 0.08);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 24px;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+.warning-strip .icon { color: var(--red); font-size: 1.3rem; }
+
+@media (max-width: 900px) {
+  .slide { padding: 40px 28px 80px; }
+  .slide-title { font-size: 2.2rem; }
+  .title-slide h1 { font-size: 3rem; }
+  .title-slide .tagline { font-size: 1.1rem; }
+  .big-stat .num { font-size: 4.5rem; }
+  .slide-grid.cols-3, .slide-grid.cols-4 { grid-template-columns: 1fr; }
+  .slide-grid.cols-2 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+<a href="index.html" class="deck-exit">← ana sayfa</a>
+<div class="deck-progress" id="progress"></div>
+<div class="deck-hint">← → ok ile gezin &nbsp;·&nbsp; F tam ekran</div>
+<div class="deck-dots" id="dots"></div>
+
+<!-- ── Slide 1: Title ─────────────────────────────────────────────── -->
+<section class="slide title-slide active" data-slide="1">
+  <div class="logo-large"></div>
+  <h1>Cassiopeia <span>Prime</span></h1>
+  <p class="tagline">DNA dizisinden plasmid hareketlilik, antibiyotik direnç ve coğrafi yayılım riski tahmini — yalnızca 568 bin parametre ile.</p>
+  <div class="meta">
+    <span class="badge">TÜBİTAK 2204-A</span>
+    <span class="badge">İYTE BilFest</span>
+    <span class="badge">Umut Keskin</span>
+  </div>
+</section>
+
+<!-- ── Slide 2: Problem ───────────────────────────────────────────── -->
+<section class="slide" data-slide="2">
+  <div class="slide-eyebrow">Problem</div>
+  <h2 class="slide-title">Antibiyotik direnci küresel bir kriz</h2>
+  <div class="big-stat">
+    <span class="num">1.27M</span>
+    <span class="unit">insan / yıl</span>
+    <div class="desc">2019'da antibiyotik direnci nedeniyle hayatını kaybetti</div>
+  </div>
+  <p class="slide-body" style="margin-top: 32px;">
+    Dünya Sağlık Örgütü 2050 için <strong>10 milyon yıllık ölüm</strong> tahmin ediyor —
+    kanserden fazla. Direnç genleri büyük ölçüde <strong>plasmidler</strong> üzerinde taşınır.
+  </p>
+</section>
+
+<!-- ── Slide 3: Plasmid ───────────────────────────────────────────── -->
+<section class="slide" data-slide="3">
+  <div class="slide-eyebrow">Temel Kavram</div>
+  <h2 class="slide-title">Plasmid nedir?</h2>
+  <p class="slide-body">
+    Bakterinin kromozomundan bağımsız, <strong>küçük, dairesel DNA</strong> parçası.
+    Bir bakteriden diğerine geçebilir. Genellikle antibiyotik direnç genlerini taşır.
+  </p>
+  <div class="svg-stage">
+    <svg viewBox="0 0 700 380" width="700" height="380" xmlns="http://www.w3.org/2000/svg">
+      <!-- bacterial chromosome -->
+      <g opacity="0.7">
+        <circle cx="350" cy="190" r="155" fill="none" stroke="#8b949e" stroke-width="3" stroke-dasharray="4 6"/>
+        <text x="350" y="370" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="13">bakteri kromozomu (kromozomal DNA)</text>
+      </g>
+      <!-- plasmid -->
+      <g>
+        <circle cx="350" cy="190" r="62" fill="none" stroke="#58a6ff" stroke-width="4"/>
+        <circle cx="350" cy="190" r="6" fill="#58a6ff"/>
+        <text x="350" y="115" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="14" font-weight="600">plasmid</text>
+        <text x="350" y="98" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="11">~2-300 kb · dairesel</text>
+        <!-- resistance gene -->
+        <rect x="345" y="130" width="14" height="14" fill="#d29922" transform="rotate(45 352 137)"/>
+        <text x="395" y="142" fill="#d29922" font-family="monospace" font-size="11">direnç geni</text>
+        <!-- mobility gene -->
+        <rect x="345" y="240" width="14" height="14" fill="#3fb950" transform="rotate(45 352 247)"/>
+        <text x="395" y="252" fill="#3fb950" font-family="monospace" font-size="11">mobilite geni</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ── Slide 4: 3 Mobility Classes ────────────────────────────────── -->
+<section class="slide" data-slide="4">
+  <div class="slide-eyebrow">Plasmid Sınıflandırması</div>
+  <h2 class="slide-title">Üç mobilite sınıfı</h2>
+  <div class="slide-grid cols-3" style="margin-top: 48px;">
+    <div class="tile" style="border-color: #6e7681;">
+      <div class="num" style="color: #6e7681;">SINIF 0</div>
+      <h3>Non-mobilizable</h3>
+      <p>Kendi başına transfer olamaz. Yalnızca dikey aktarımla (bölünme) çoğalır.</p>
+      <svg viewBox="0 0 200 80" style="margin-top: 20px;">
+        <circle cx="50" cy="40" r="20" fill="none" stroke="#6e7681" stroke-width="2"/>
+        <circle cx="150" cy="40" r="20" fill="none" stroke="#6e7681" stroke-width="2" stroke-dasharray="3 3" opacity="0.4"/>
+        <line x1="75" y1="40" x2="125" y2="40" stroke="#f85149" stroke-width="2" stroke-dasharray="4 3"/>
+        <text x="100" y="35" text-anchor="middle" fill="#f85149" font-family="monospace" font-size="10">✗ transfer yok</text>
+      </svg>
+    </div>
+    <div class="tile" style="border-color: #d29922;">
+      <div class="num" style="color: #d29922;">SINIF 1</div>
+      <h3>Mobilizable</h3>
+      <p>Yardımcı bir conjugative plasmid varsa transfer olabilir. Tek başına yetersiz.</p>
+      <svg viewBox="0 0 220 80" style="margin-top: 20px;">
+        <circle cx="45" cy="40" r="18" fill="none" stroke="#d29922" stroke-width="2"/>
+        <circle cx="110" cy="40" r="22" fill="none" stroke="#3fb950" stroke-width="2.5"/>
+        <circle cx="180" cy="40" r="18" fill="none" stroke="#d29922" stroke-width="2" stroke-dasharray="3 3" opacity="0.4"/>
+        <path d="M 70 40 Q 90 25 130 40" stroke="#3fb950" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+        <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="#3fb950"/></marker></defs>
+        <text x="100" y="65" text-anchor="middle" fill="#d29922" font-family="monospace" font-size="10">yardımcı ile</text>
+      </svg>
+    </div>
+    <div class="tile" style="border-color: #3fb950;">
+      <div class="num" style="color: #3fb950;">SINIF 2</div>
+      <h3>Conjugative</h3>
+      <p>Kendi başına transfer olur. <strong style="color: #3fb950;">En tehlikeli sınıf.</strong></p>
+      <svg viewBox="0 0 220 80" style="margin-top: 20px;">
+        <circle cx="45" cy="40" r="18" fill="none" stroke="#3fb950" stroke-width="2.5"/>
+        <circle cx="180" cy="40" r="22" fill="none" stroke="#3fb950" stroke-width="2.5"/>
+        <line x1="68" y1="40" x2="158" y2="40" stroke="#3fb950" stroke-width="2.5" marker-end="url(#arr2)"/>
+        <defs><marker id="arr2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><polygon points="0 0, 6 3, 0 6" fill="#3fb950"/></marker></defs>
+        <text x="110" y="65" text-anchor="middle" fill="#3fb950" font-family="monospace" font-size="10">otonom transfer</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ── Slide 5: Current methods fail ──────────────────────────────── -->
+<section class="slide" data-slide="5">
+  <div class="slide-eyebrow">Mevcut Durum</div>
+  <h2 class="slide-title">Geleneksel yöntemler neden yetmiyor?</h2>
+  <div class="slide-grid cols-3" style="margin-top: 56px;">
+    <div class="tile">
+      <div class="num">01</div>
+      <h3 style="color: #f85149;">BLAST</h3>
+      <p>Devasa veritabanında benzer dizi arar. <strong>Saatler</strong> sürer, yüzlerce MB veritabanı gerektirir.</p>
+    </div>
+    <div class="tile">
+      <div class="num">02</div>
+      <h3 style="color: #f85149;">Gen anotasyonu</h3>
+      <p>Plasmiddeki tüm genleri tek tek bulup yorumlar. <strong>Uzmanlık</strong> ve günler gerektirir.</p>
+    </div>
+    <div class="tile">
+      <div class="num">03</div>
+      <h3 style="color: #f85149;">Metadata</h3>
+      <p>Hangi ülke, hangi hasta, hangi yıl? Bilgi her zaman eksik. <strong>Yanıltıcı</strong> olabilir.</p>
+    </div>
+  </div>
+  <p class="slide-body" style="margin-top: 48px; font-size: 1.4rem;">
+    <strong>Salgın bu kadar beklemiyor.</strong>
+  </p>
+</section>
+
+<!-- ── Slide 6: Solution concept ──────────────────────────────────── -->
+<section class="slide" data-slide="6">
+  <div class="slide-eyebrow">Çözüm</div>
+  <h2 class="slide-title">Cassiopeia Prime</h2>
+  <p class="slide-subtitle">Sadece DNA harf dizisinden, BLAST'sız, gen anotasyonsuz, metadatasız — <strong style="color: var(--accent);">60 milisaniyede</strong> üç riski birlikte tahmin eder.</p>
+  <div class="flow">
+    <div class="step">ATGCGTACG...</div>
+    <span class="arrow">→</span>
+    <div class="step" style="border-color: var(--accent); color: var(--accent);">⚡ 60 ms</div>
+    <span class="arrow">→</span>
+    <div class="step">mobilite sınıfı</div>
+    <div class="step">AMR olasılığı</div>
+    <div class="step">yayılım riski</div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi"><div class="v">568K</div><div class="l">parametre</div></div>
+    <div class="kpi"><div class="v">5.81 MB</div><div class="l">model boyutu</div></div>
+    <div class="kpi"><div class="v">60 ms</div><div class="l">tahmin süresi</div></div>
+  </div>
+</section>
+
+<!-- ── Slide 7: Data pipeline ────────────────────────────────────── -->
+<section class="slide" data-slide="7">
+  <div class="slide-eyebrow">Veri</div>
+  <h2 class="slide-title">PLSDB → 2.048 plasmid</h2>
+  <div class="flow" style="margin-top: 48px;">
+    <div class="step">PLSDB<br><small style="color: var(--text3);">~30.000 plasmid</small></div>
+    <span class="arrow">→</span>
+    <div class="step">filtre<br><small style="color: var(--text3);">uzunluk, N-oranı</small></div>
+    <span class="arrow">→</span>
+    <div class="step">limit 2.048<br><small style="color: var(--text3);">bilinçli kısıt</small></div>
+    <span class="arrow">→</span>
+    <div class="step" style="border-color: var(--accent);">4 parçaya böl</div>
+  </div>
+  <div class="slide-grid cols-4" style="margin-top: 56px;">
+    <div class="tile"><div class="num" style="color: var(--accent);">1.466</div><h3>Eğitim</h3><p>Modele öğretmek için</p></div>
+    <div class="tile"><div class="num" style="color: var(--orange);">286</div><h3>Doğrulama</h3><p>Eğitim sırasında kontrol</p></div>
+    <div class="tile"><div class="num" style="color: var(--purple);">296</div><h3>Test</h3><p>Geliştirme sınavı</p></div>
+    <div class="tile" style="border-color: var(--green);"><div class="num" style="color: var(--green);">1.200</div><h3>Held-out</h3><p><strong>Gerçek sınav</strong> · model hiç görmedi</p></div>
+  </div>
+</section>
+
+<!-- ── Slide 8: Group-aware splitting ────────────────────────────── -->
+<section class="slide" data-slide="8">
+  <div class="slide-eyebrow">Veri Sızıntısını Önleme</div>
+  <h2 class="slide-title">Group-aware splitting</h2>
+  <p class="slide-body">
+    Modelin eğitimde gördüğüne benzeyen bir plasmid test setine düşerse, model <strong>ezberler</strong> — gerçek bir sınav olmaz.
+  </p>
+  <div class="svg-stage">
+    <svg viewBox="0 0 800 320" width="800" height="320" xmlns="http://www.w3.org/2000/svg">
+      <!-- step 1: 21-mer sampling -->
+      <g transform="translate(20, 80)">
+        <text x="0" y="-10" fill="#8b949e" font-family="monospace" font-size="11">1) 21-mer örnekleme</text>
+        <rect width="120" height="40" rx="4" fill="#161b22" stroke="#30363d"/>
+        <text x="60" y="25" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="13">ATGC...GTAC</text>
+      </g>
+      <g transform="translate(180, 60)">
+        <text x="0" y="0" fill="#8b949e" font-family="monospace" font-size="11">2) Jaccard ≥ 0.85</text>
+        <text x="0" y="50" fill="#58a6ff" font-family="monospace" font-size="28" font-weight="700">A ∩ B</text>
+        <text x="0" y="80" fill="#8b949e" font-family="monospace" font-size="11">─── = ≥ 0.85 ?</text>
+        <text x="0" y="100" fill="#8b949e" font-family="monospace" font-size="11">A ∪ B</text>
+      </g>
+      <g transform="translate(330, 50)">
+        <text x="0" y="0" fill="#8b949e" font-family="monospace" font-size="11">3) küme oluştur</text>
+        <circle cx="40" cy="60" r="22" fill="none" stroke="#58a6ff" stroke-width="2"/>
+        <circle cx="40" cy="60" r="8" fill="#58a6ff" opacity="0.3"/>
+        <circle cx="90" cy="80" r="20" fill="none" stroke="#58a6ff" stroke-width="2"/>
+        <circle cx="90" cy="80" r="7" fill="#58a6ff" opacity="0.3"/>
+        <line x1="58" y1="65" x2="72" y2="76" stroke="#58a6ff" stroke-width="2"/>
+        <circle cx="150" cy="55" r="20" fill="none" stroke="#58a6ff" stroke-width="2"/>
+        <circle cx="150" cy="55" r="7" fill="#58a6ff" opacity="0.3"/>
+        <line x1="108" y1="75" x2="132" y2="60" stroke="#58a6ff" stroke-width="2"/>
+        <circle cx="190" cy="100" r="22" fill="none" stroke="#3fb950" stroke-width="2"/>
+        <circle cx="190" cy="100" r="8" fill="#3fb950" opacity="0.3"/>
+        <circle cx="245" cy="75" r="20" fill="none" stroke="#3fb950" stroke-width="2"/>
+        <circle cx="245" cy="75" r="7" fill="#3fb950" opacity="0.3"/>
+        <line x1="208" y1="95" x2="227" y2="80" stroke="#3fb950" stroke-width="2"/>
+      </g>
+      <g transform="translate(610, 70)">
+        <text x="0" y="0" fill="#8b949e" font-family="monospace" font-size="11">4) küme bazlı böl</text>
+        <rect x="0" y="20" width="65" height="40" rx="4" fill="#58a6ff" opacity="0.2" stroke="#58a6ff"/>
+        <text x="32" y="45" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="12">train</text>
+        <rect x="80" y="20" width="65" height="40" rx="4" fill="#3fb950" opacity="0.2" stroke="#3fb950"/>
+        <text x="112" y="45" text-anchor="middle" fill="#3fb950" font-family="monospace" font-size="12">test</text>
+        <text x="0" y="85" fill="#8b949e" font-family="monospace" font-size="10">benzer küme hep aynı tarafta</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ── Slide 9: Multi-scale windows ───────────────────────────────── -->
+<section class="slide" data-slide="9">
+  <div class="slide-eyebrow">Özellik Çıkarma</div>
+  <h2 class="slide-title">Üç ölçekte aynı anda bakış</h2>
+  <p class="slide-body">Bir DNA dizisini 512 / 2.048 / 8.192 harflik pencerelere bölüyoruz. Her ölçek farklı biyolojik sinyali yakalar.</p>
+  <div class="svg-stage">
+    <svg viewBox="0 0 900 280" width="900" height="280" xmlns="http://www.w3.org/2000/svg">
+      <!-- DNA bar -->
+      <g transform="translate(30, 130)">
+        <text x="0" y="-8" fill="#8b949e" font-family="monospace" font-size="11">plazmid DNA</text>
+        <rect x="0" y="0" width="800" height="10" fill="#30363d" rx="2"/>
+        <text x="800" y="-8" text-anchor="end" fill="#8b949e" font-family="monospace" font-size="11">~10 kb</text>
+      </g>
+      <!-- scale 1 -->
+      <g transform="translate(30, 50)">
+        <text x="0" y="-8" fill="#58a6ff" font-family="monospace" font-size="12" font-weight="600">KÜÇÜK · 512 bp · 32 pencere · stride 256</text>
+        <g>
+          <rect x="0" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="25" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="50" y="0" width="30" height="14" fill="#58a6ff" opacity="0.6" rx="1"/>
+          <rect x="75" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="100" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="125" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="150" y="0" width="30" height="14" fill="#58a6ff" opacity="0.6" rx="1"/>
+          <rect x="175" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="200" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="225" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="250" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="275" y="0" width="30" height="14" fill="#58a6ff" opacity="0.6" rx="1"/>
+          <rect x="300" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="325" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="350" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="375" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="400" y="0" width="30" height="14" fill="#58a6ff" opacity="0.6" rx="1"/>
+          <rect x="425" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="450" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="475" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="500" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="525" y="0" width="30" height="14" fill="#58a6ff" opacity="0.6" rx="1"/>
+          <rect x="550" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="575" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="600" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="625" y="0" width="30" height="14" fill="#58a6ff" opacity="0.6" rx="1"/>
+          <rect x="650" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="675" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="700" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+          <rect x="725" y="0" width="30" height="14" fill="#58a6ff" opacity="0.6" rx="1"/>
+          <rect x="750" y="0" width="30" height="14" fill="#58a6ff" opacity="0.5" rx="1"/>
+          <rect x="775" y="0" width="30" height="14" fill="#58a6ff" opacity="0.4" rx="1"/>
+        </g>
+        <text x="800" y="11" fill="#8b949e" font-family="monospace" font-size="10">→ lokal motifler</text>
+      </g>
+      <!-- scale 2 -->
+      <g transform="translate(30, 110)">
+        <text x="0" y="-8" fill="#d29922" font-family="monospace" font-size="12" font-weight="600">ORTA · 2.048 bp · 16 pencere · stride 1.024</text>
+        <g>
+          <rect x="0" y="0" width="115" height="14" fill="#d29922" opacity="0.4" rx="1"/>
+          <rect x="110" y="0" width="115" height="14" fill="#d29922" opacity="0.5" rx="1"/>
+          <rect x="220" y="0" width="115" height="14" fill="#d29922" opacity="0.6" rx="1"/>
+          <rect x="330" y="0" width="115" height="14" fill="#d29922" opacity="0.4" rx="1"/>
+          <rect x="440" y="0" width="115" height="14" fill="#d29922" opacity="0.5" rx="1"/>
+          <rect x="550" y="0" width="115" height="14" fill="#d29922" opacity="0.4" rx="1"/>
+          <rect x="660" y="0" width="115" height="14" fill="#d29922" opacity="0.6" rx="1"/>
+          <rect x="770" y="0" width="30" height="14" fill="#d29922" opacity="0.5" rx="1"/>
+        </g>
+        <text x="800" y="11" fill="#8b949e" font-family="monospace" font-size="10">→ gen büyüklüğü</text>
+      </g>
+      <!-- scale 3 -->
+      <g transform="translate(30, 170)">
+        <text x="0" y="-8" fill="#3fb950" font-family="monospace" font-size="12" font-weight="600">BÜYÜK · 8.192 bp · 8 pencere · stride 4.096</text>
+        <g>
+          <rect x="0" y="0" width="465" height="14" fill="#3fb950" opacity="0.5" rx="1"/>
+          <rect x="460" y="0" width="335" height="14" fill="#3fb950" opacity="0.6" rx="1"/>
+        </g>
+        <text x="800" y="11" fill="#8b949e" font-family="monospace" font-size="10">→ operon, kaset</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ── Slide 10: Architecture (TEXT-FREE) ────────────────────────── -->
+<section class="slide" data-slide="10">
+  <div class="arch-stage">
+    <svg viewBox="0 0 1100 720" width="1100" height="720" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="gIn" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#58a6ff" stop-opacity="0.1"/>
+          <stop offset="100%" stop-color="#58a6ff" stop-opacity="0.3"/>
+        </linearGradient>
+        <linearGradient id="gEnc" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#bc8cff" stop-opacity="0.15"/>
+          <stop offset="100%" stop-color="#bc8cff" stop-opacity="0.35"/>
+        </linearGradient>
+        <linearGradient id="gOut" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#3fb950" stop-opacity="0.15"/>
+          <stop offset="100%" stop-color="#3fb950" stop-opacity="0.35"/>
+        </linearGradient>
+        <marker id="a1" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <polygon points="0 0, 10 5, 0 10" fill="#58a6ff"/>
+        </marker>
+        <marker id="a2" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <polygon points="0 0, 10 5, 0 10" fill="#bc8cff"/>
+        </marker>
+        <marker id="a3" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <polygon points="0 0, 10 5, 0 10" fill="#3fb950"/>
+        </marker>
+      </defs>
+
+      <!-- Input layer -->
+      <g transform="translate(40, 320)">
+        <rect x="0" y="0" width="140" height="80" rx="8" fill="url(#gIn)" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="70" y="32" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="13" font-weight="600">DNA dizisi</text>
+        <text x="70" y="52" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="11">ATGCGTACG...</text>
+        <text x="70" y="68" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="10">10-300 kb</text>
+      </g>
+
+      <!-- arrow to windows -->
+      <line x1="180" y1="360" x2="220" y2="360" stroke="#58a6ff" stroke-width="2" marker-end="url(#a1)"/>
+
+      <!-- Multi-scale windows -->
+      <g transform="translate(220, 200)">
+        <rect x="0" y="0" width="140" height="320" rx="8" fill="url(#gIn)" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="70" y="22" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="12" font-weight="600">56 pencere</text>
+        <text x="70" y="40" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="10">3 ölçek</text>
+        <g transform="translate(20, 60)">
+          <text x="0" y="0" fill="#58a6ff" font-family="monospace" font-size="10">512 bp × 32</text>
+        </g>
+        <g transform="translate(20, 140)">
+          <text x="0" y="0" fill="#d29922" font-family="monospace" font-size="10">2.048 bp × 16</text>
+        </g>
+        <g transform="translate(20, 220)">
+          <text x="0" y="0" fill="#3fb950" font-family="monospace" font-size="10">8.192 bp × 8</text>
+        </g>
+      </g>
+
+      <line x1="360" y1="360" x2="400" y2="360" stroke="#58a6ff" stroke-width="2" marker-end="url(#a1)"/>
+
+      <!-- K-mer extraction -->
+      <g transform="translate(400, 290)">
+        <rect x="0" y="0" width="160" height="140" rx="8" fill="url(#gIn)" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="80" y="28" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="12" font-weight="600">Canonical k-mer</text>
+        <text x="80" y="48" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="10">4-6 mer</text>
+        <text x="80" y="78" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="20" font-weight="700">2.728</text>
+        <text x="80" y="96" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="10">boyut</text>
+        <text x="80" y="118" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="10">+ 49 yapısal</text>
+      </g>
+
+      <line x1="560" y1="360" x2="600" y2="360" stroke="#bc8cff" stroke-width="2" marker-end="url(#a2)"/>
+
+      <!-- Encoder block -->
+      <g transform="translate(600, 80)">
+        <rect x="0" y="0" width="220" height="560" rx="10" fill="url(#gEnc)" stroke="#bc8cff" stroke-width="2"/>
+        <text x="110" y="28" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="13" font-weight="600">Encoder</text>
+        <text x="110" y="46" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="10">568.437 parametre</text>
+
+        <g transform="translate(20, 70)">
+          <rect width="180" height="32" rx="5" fill="#1c2333" stroke="#bc8cff" stroke-width="1" opacity="0.9"/>
+          <text x="90" y="20" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11">FRP + F-LoRA</text>
+        </g>
+        <g transform="translate(20, 115)">
+          <rect width="180" height="32" rx="5" fill="#1c2333" stroke="#bc8cff" stroke-width="1" opacity="0.9"/>
+          <text x="90" y="20" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11">Bottleneck (128 dim)</text>
+        </g>
+        <g transform="translate(20, 160)">
+          <rect width="180" height="32" rx="5" fill="#1c2333" stroke="#bc8cff" stroke-width="1" opacity="0.9"/>
+          <text x="90" y="20" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11">Struct füzyon</text>
+        </g>
+        <g transform="translate(20, 205)">
+          <rect width="180" height="32" rx="5" fill="#1c2333" stroke="#bc8cff" stroke-width="1" opacity="0.9"/>
+          <text x="90" y="20" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11">CPPE (dairesel)</text>
+        </g>
+        <g transform="translate(20, 250)">
+          <rect width="180" height="32" rx="5" fill="#1c2333" stroke="#bc8cff" stroke-width="1" opacity="0.9"/>
+          <text x="90" y="20" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11">ScaleGate</text>
+        </g>
+        <g transform="translate(20, 295)">
+          <rect width="180" height="60" rx="5" fill="#1c2333" stroke="#bc8cff" stroke-width="1.5" opacity="0.95"/>
+          <text x="90" y="24" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="12" font-weight="600">RingSSM × 3</text>
+          <text x="90" y="42" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="10">dairesel konvolüsyon</text>
+        </g>
+        <g transform="translate(20, 370)">
+          <rect width="180" height="32" rx="5" fill="#1c2333" stroke="#bc8cff" stroke-width="1" opacity="0.9"/>
+          <text x="90" y="20" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11">DropPath + Norm</text>
+        </g>
+        <g transform="translate(20, 425)">
+          <rect width="180" height="100" rx="5" fill="#1c2333" stroke="#bc8cff" stroke-width="1.5"/>
+          <text x="90" y="22" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="12" font-weight="600">Evidence Pool</text>
+          <text x="90" y="44" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="10">attention ile</text>
+          <text x="90" y="60" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="10">en önemli</text>
+          <text x="90" y="76" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="10">pencereleri topla</text>
+        </g>
+      </g>
+
+      <line x1="820" y1="200" x2="860" y2="200" stroke="#3fb950" stroke-width="2" marker-end="url(#a3)"/>
+      <line x1="820" y1="360" x2="860" y2="360" stroke="#3fb950" stroke-width="2" marker-end="url(#a3)"/>
+      <line x1="820" y1="520" x2="860" y2="520" stroke="#3fb950" stroke-width="2" marker-end="url(#a3)"/>
+
+      <!-- Task Adapters -->
+      <g transform="translate(860, 150)">
+        <rect x="0" y="0" width="100" height="100" rx="6" fill="#1c2333" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="50" y="20" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11" font-weight="600">Mob</text>
+        <text x="50" y="36" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="9">adapter</text>
+        <text x="50" y="60" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="9">rank 12</text>
+      </g>
+      <g transform="translate(860, 310)">
+        <rect x="0" y="0" width="100" height="100" rx="6" fill="#1c2333" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="50" y="20" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11" font-weight="600">AMR</text>
+        <text x="50" y="36" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="9">adapter</text>
+        <text x="50" y="60" text-anchor="middle" fill="#d29922" font-family="monospace" font-size="9">rank 12</text>
+      </g>
+      <g transform="translate(860, 470)">
+        <rect x="0" y="0" width="100" height="100" rx="6" fill="#1c2333" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="50" y="20" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11" font-weight="600">Exp</text>
+        <text x="50" y="36" text-anchor="middle" fill="#8b949e" font-family="monospace" font-size="9">adapter</text>
+        <text x="50" y="60" text-anchor="middle" fill="#3fb950" font-family="monospace" font-size="9">rank 12</text>
+      </g>
+
+      <!-- Heads -->
+      <g transform="translate(990, 175)">
+        <rect x="0" y="0" width="90" height="50" rx="5" fill="url(#gOut)" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="45" y="22" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11" font-weight="600">mob_head</text>
+        <text x="45" y="38" text-anchor="middle" fill="#58a6ff" font-family="monospace" font-size="10">3 sınıf</text>
+      </g>
+      <g transform="translate(990, 335)">
+        <rect x="0" y="0" width="90" height="50" rx="5" fill="url(#gOut)" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="45" y="22" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11" font-weight="600">amr_head</text>
+        <text x="45" y="38" text-anchor="middle" fill="#d29922" font-family="monospace" font-size="10">1 olasılık</text>
+      </g>
+      <g transform="translate(990, 495)">
+        <rect x="0" y="0" width="90" height="50" rx="5" fill="url(#gOut)" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="45" y="22" text-anchor="middle" fill="#c9d1d9" font-family="monospace" font-size="11" font-weight="600">exp_head</text>
+        <text x="45" y="38" text-anchor="middle" fill="#3fb950" font-family="monospace" font-size="10">1 olasılık</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ── Slide 11: Training ─────────────────────────────────────────── -->
+<section class="slide" data-slide="11">
+  <div class="slide-eyebrow">Eğitim</div>
+  <h2 class="slide-title">Üç görev, tek model, ensemble ile</h2>
+  <div class="slide-grid cols-3" style="margin-top: 48px;">
+    <div class="tile">
+      <div class="num">Multi-task loss</div>
+      <h3>Üç görev birlikte</h3>
+      <p>Mobilite + AMR + Expansion. Birbirleriyle ilişkili olduklarını birlikte öğrenir.</p>
+    </div>
+    <div class="tile">
+      <div class="num">Tutarlılık düzenlileştirmesi</div>
+      <h3>RC invariance</h3>
+      <p>Aynı plasmidin düz ve ters hâli aynı sonucu vermeli. Model bunu öğrenir.</p>
+    </div>
+    <div class="tile">
+      <div class="num">SWA + L-BFGS</div>
+      <h3>Kalibrasyon</h3>
+      <p>Ağırlık ortalaması + sıcaklık ölçekleme. Olasılıklar gerçek doğrulukla hizalanır.</p>
+    </div>
+  </div>
+  <div class="callout" style="margin-top: 56px;">
+    <span class="accent">Ensemble (v14 + v15):</span> iki modeli ağırlıklı birleştir → +2.03 puan ek task score
+  </div>
+</section>
+
+<!-- ── Slide 12: Results ──────────────────────────────────────────── -->
+<section class="slide" data-slide="12">
+  <div class="slide-eyebrow">Sonuçlar</div>
+  <h2 class="slide-title">Held-out test (1.200 plasmid · model hiç görmedi)</h2>
+  <div class="big-stat" style="margin-top: 24px;">
+    <span class="num">87.0%</span>
+    <span class="unit">task score</span>
+    <div class="desc">95% güven aralığı: <strong style="color: var(--accent);">86.2 – 87.8%</strong> · 500 bootstrap resample</div>
+  </div>
+  <table class="bench-table" style="margin-top: 40px;">
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Mobility BA</th>
+        <th>AMR AUROC</th>
+        <th>Expansion AUROC</th>
+        <th>Parametre</th>
+        <th>Latency</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="us">
+        <td>Cassiopeia Prime (biz)</td>
+        <td class="highlight">78.33%</td>
+        <td class="highlight">93.89%</td>
+        <td class="highlight">88.78%</td>
+        <td class="highlight">0.57M</td>
+        <td class="highlight">60ms</td>
+      </tr>
+      <tr>
+        <td>Nucleotide Transformer</td>
+        <td>72.10%</td>
+        <td>89.20%</td>
+        <td>82.80%</td>
+        <td>500M</td>
+        <td>890ms</td>
+      </tr>
+      <tr>
+        <td>DNABERT-2</td>
+        <td>70.50%</td>
+        <td>87.80%</td>
+        <td>81.20%</td>
+        <td>117M</td>
+        <td>280ms</td>
+      </tr>
+      <tr>
+        <td>DNABERT</td>
+        <td>68.20%</td>
+        <td>85.10%</td>
+        <td>79.30%</td>
+        <td>110M</td>
+        <td>320ms</td>
+      </tr>
+      <tr>
+        <td>PLSDB k-mer LR</td>
+        <td>61.40%</td>
+        <td>78.50%</td>
+        <td>74.10%</td>
+        <td>0.002M</td>
+        <td>1.2ms</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ── Slide 13: Demo example ────────────────────────────────────── -->
+<section class="slide" data-slide="13">
+  <div class="slide-eyebrow">Canlı Genelleme Testi</div>
+  <h2 class="slide-title">pOXA-48 &amp; pNDM-1 — model hiç görmedi</h2>
+  <p class="slide-body">
+    Bu iki plasmid antibiyotik direnci tarihinin en tehlikeli örnekleri. pOXA-48 <strong>2001'de İstanbul'da</strong>, pNDM-1 <strong>2008'de Yeni Delhi'de</strong> keşfedildi. Her ikisi de modelin <strong>eğitim setinde, validasyon, test ve held-out sette YOK</strong>.
+  </p>
+  <div class="slide-grid cols-2" style="margin-top: 40px;">
+    <div class="tile" style="border-color: var(--red);">
+      <div class="num" style="color: var(--red);">pOXA-48 · JN626286.1 · 62 kb</div>
+      <h3>Model tahmini (HIGH güvenle)</h3>
+      <p>🧬 <strong style="color: #3fb950;">Mobilite:</strong> conjugative</p>
+      <p>💊 <strong style="color: var(--red);">AMR olasılığı:</strong> yüksek</p>
+      <p>🌍 <strong style="color: var(--orange);">Yayılım riski:</strong> yüksek</p>
+      <p style="margin-top: 16px; font-family: var(--font); font-size: 0.85rem; color: var(--text3);">60 ms · eğitim seti dışı</p>
+    </div>
+    <div class="tile" style="border-color: var(--red);">
+      <div class="num" style="color: var(--red);">pNDM-1 · CP029631.1 · 249 kb</div>
+      <h3>Model tahmini (HIGH güvenle)</h3>
+      <p>🧬 <strong style="color: #3fb950;">Mobilite:</strong> conjugative</p>
+      <p>💊 <strong style="color: var(--red);">AMR olasılığı:</strong> yüksek</p>
+      <p>🌍 <strong style="color: var(--orange);">Yayılım riski:</strong> yüksek</p>
+      <p style="margin-top: 16px; font-family: var(--font); font-size: 0.85rem; color: var(--text3);">60 ms · eğitim seti dışı</p>
+    </div>
+  </div>
+  <p class="slide-body" style="margin-top: 32px; font-size: 1.2rem; color: var(--accent);">
+    → Out-of-distribution generalization, başarıyla.
+  </p>
+</section>
+
+<!-- ── Slide 14: Limitations ──────────────────────────────────────── -->
+<section class="slide" data-slide="14">
+  <div class="slide-eyebrow">Sınırlar ve Etik</div>
+  <h2 class="slide-title">Dürüst olalım</h2>
+  <div class="slide-grid cols-2" style="margin-top: 32px;">
+    <div class="tile">
+      <h3>Teknik sınırlar</h3>
+      <p>• Gen adı vermez — AMRFinder gibi araçlar daha kesin<br>
+         • Evidence window'lar deneysel doğrulanmamış<br>
+         • Held-out 1.200 plasmid, küçük örneklem<br>
+         • Mobilizable (sınıf 1) F1 hâlâ 0.72<br>
+         • Expansion bir proxy · sampling bias var</p>
+    </div>
+    <div class="tile" style="border-color: var(--red);">
+      <h3 style="color: var(--red);">Kullanım sınırı</h3>
+      <p style="color: var(--red); font-weight: 600;">Tarama sinyalidir; klinik, çevresel veya biyogüvenlik kararlarında tek başına kullanılamaz.</p>
+      <p>Sonuçlar deneysel olarak doğrulanmalı, AMRFinder + manuel anotasyon ile desteklenmelidir.</p>
+    </div>
+  </div>
+  <div class="warning-strip">
+    <span class="icon">⚠</span>
+    <div>Bilinen genler için AMRFinder · biz tarama aracıyız · klinik karar aracı değil.</div>
+  </div>
+</section>
+
+<!-- ── Slide 15: Conclusion ──────────────────────────────────────── -->
+<section class="slide" data-slide="15">
+  <div class="slide-eyebrow">Sonuç</div>
+  <h2 class="slide-title">Küçük model, küçük veri, doğru mühendislik</h2>
+  <div class="kpi-row" style="margin-top: 48px;">
+    <div class="kpi"><div class="v">568K</div><div class="l">parametre</div></div>
+    <div class="kpi"><div class="v">5.81 MB</div><div class="l">model dosyası</div></div>
+    <div class="kpi"><div class="v">60 ms</div><div class="l">tahmin süresi</div></div>
+    <div class="kpi"><div class="v">%87</div><div class="l">held-out task score</div></div>
+  </div>
+  <p class="slide-subtitle" style="margin-top: 48px;">
+    Bir cep telefonunda, bir Raspberry Pi'da, internet olmadan çalışabilir. Sahra'daki laboratuvar, sahra kliniği, hızlı triyaj gerektiren her yerde.
+  </p>
+  <div style="margin-top: 56px; font-family: var(--font); font-size: 0.9rem; color: var(--text3);">
+    <a href="index.html" style="color: var(--accent); text-decoration: none; border: 1px solid var(--accent); padding: 10px 22px; border-radius: 6px; display: inline-block;">→ canlı demoyu dene</a>
+    &nbsp;&nbsp;
+    <a href="benchmark.html" style="color: var(--text2); text-decoration: none; border: 1px solid var(--border); padding: 10px 22px; border-radius: 6px; display: inline-block;">benchmark detayları</a>
+  </div>
+  <p style="margin-top: 64px; font-size: 1.3rem; color: var(--text2);">
+    Teşekkürler. <span style="color: var(--accent);">Sorular?</span>
+  </p>
+</section>
+
+<div class="slide-num" id="slideNum">1 / 15</div>
+
+</div>
+
+<script>
+(function() {
+  const slides = document.querySelectorAll('.slide');
+  const dots = document.getElementById('dots');
+  const progress = document.getElementById('progress');
+  const slideNum = document.getElementById('slideNum');
+  const total = slides.length;
+  let current = 0;
+
+  // build dots
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => goTo(i));
+    dots.appendChild(dot);
+  }
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= total) return;
+    slides[current].classList.remove('active');
+    if (idx < current) slides[current].classList.add('prev');
+    else slides[current].classList.remove('prev');
+    setTimeout(() => slides[idx < current ? idx + 1 : 0] && slides[idx < current ? idx : 0], 0);
+    slides.forEach(s => s.classList.remove('prev'));
+    if (idx < current) slides[idx].classList.add('prev');
+    current = idx;
+    slides[current].classList.remove('prev');
+    slides[current].classList.add('active');
+    update();
+  }
+
+  function update() {
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+    progress.style.width = ((current + 1) / total * 100) + '%';
+    slideNum.textContent = (current + 1) + ' / ' + total;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault();
+      goTo(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault();
+      goTo(current - 1);
+    } else if (e.key === 'Home') {
+      goTo(0);
+    } else if (e.key === 'End') {
+      goTo(total - 1);
+    } else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen();
+    } else if (e.key === 'Escape' && document.fullscreenElement) {
+      document.exitFullscreen();
+    }
+  });
+
+  // click anywhere on the right half to advance, left half to go back
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('a, button, .dot, .deck-exit')) return;
+    const x = e.clientX / window.innerWidth;
+    if (x > 0.5) goTo(current + 1);
+    else goTo(current - 1);
+  });
+
+  update();
+})();
+</script>
+</body>
+</html>
